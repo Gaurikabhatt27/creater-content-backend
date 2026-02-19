@@ -1,9 +1,9 @@
-import { registerUser, loginUser } from "../services/authServices.js";
+import { registerUser, loginUser } from "../services/authService.js";
 import generateToken from "../utils/generateToken.js";
-import { saveOtp } from "../services/otpServices.js";
+import { saveOtp } from "../services/otpService.js";
 import { sendEmail } from "../sendEmail.js";
-import { verifyOtpService } from "../services/otpServices.js";
-import { generateOtp } from "../services/otpServices.js";
+import { verifyOtpService } from "../services/otpService.js";
+import { generateOtp } from "../services/otpService.js";
 export const signup = async (req, res) => {
   try {
     const { user, token } = await registerUser(req.body);
