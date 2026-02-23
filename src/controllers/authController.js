@@ -14,6 +14,7 @@ export const signup = async (req, res) => {
     });
 
     res.status(201).json({
+      _id: user._id,
       id: user._id,
       name: user.name,
       email: user.email
@@ -34,6 +35,7 @@ export const login = async (req, res) => {
     });
 
     res.json({
+      _id: user._id,
       id: user._id,
       name: user.name,
       email: user.email
@@ -57,11 +59,11 @@ export const sendOtpController = async (req, res) => {
   try {
     const { email } = req.body;
 
-    const otp =  generateOtp();
-    console.log("otp",otp);
+    const otp = generateOtp();
+    console.log("otp", otp);
     await saveOtp(email, otp);
     console.log()
-       await sendEmail(
+    await sendEmail(
       email,
       "Your OTP Code",
       `Your OTP is ${otp}. It expires in 5 minutes.`
@@ -99,8 +101,27 @@ export const verifyOtpController = async (req, res) => {
   }
 };
 
+import User from "../models/User.js";
+
 export const getMe = async (req, res) => {
-  const token = req.cookies.token;
-  if(token) return res.json({ id: 1, name: "Test User" });
+  const user = req.user;
+  if (user) {
+    return res.json({
+      _id: user._id,
+      id: user._id,
+      name: user.name,
+      email: user.email
+    });
+  }
   return res.status(401).json({ message: "Not authenticated" });
+};
+
+export const getAllUsers = async (req, res) => {
+  try {
+    // Return all users except the current user
+    const users = await User.find({ _id: { $ne: req.user._id } }).select("-password");
+    res.json({ success: true, users });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };

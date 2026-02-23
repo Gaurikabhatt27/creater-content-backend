@@ -56,3 +56,26 @@ export const sendMessage = async (req, res) => {
         res.status(500).json({ success: false });
     }
 };
+
+export const sendMediaMessage = async (req, res) => {
+    try {
+        const { conversationId, senderId, receiverId, text } = req.body;
+
+        if (!conversationId || !senderId || !receiverId) {
+            return res.status(400).json({ success: false, message: "Missing required fields" });
+        }
+
+        const message = await import("../services/chatService.js").then(m => m.sendMediaMessage(
+            req.file,
+            conversationId,
+            senderId,
+            receiverId,
+            text
+        ));
+
+        res.status(200).json({ success: true, message });
+    } catch (error) {
+        console.error("sendMediaMessage error:", error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
