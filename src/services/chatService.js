@@ -29,3 +29,19 @@ export const getMessages = async (conversationId) => {
     return await Message.find({ conversation: conversationId }).sort({ createdAt: 1 });
 };
 
+export const sendMessage = async (conversationId, senderId, receiverId, text) => {
+    const message = new Message({
+        conversation: conversationId,
+        sender: senderId,
+        receiver: receiverId,
+        text
+    });
+
+    await message.save();
+
+    await Conversation.findByIdAndUpdate(conversationId, {
+        lastMessage: message._id
+    });
+
+    return message;
+};

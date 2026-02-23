@@ -7,10 +7,14 @@ import authRoutes from "./routes/authRoutes.js";
 import "dotenv/config";
 import assetRoutes from "./routes/assetRoute.js";
 import chatRoutes from "./routes/chatRoutes.js";
+import http from "http";
+import { initSocket } from "./sockets/socket.js";
 
 connectDB();
 
 const app = express();
+const server = http.createServer(app);
+initSocket(server);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -26,6 +30,6 @@ app.use("/api/chat", chatRoutes);
 
 const PORT = process.env.PORT || 5500;
 
-app.listen(PORT , () => {
+server.listen(PORT, () => {
     console.log(`Server Running on port ${PORT}`);
-})
+});
