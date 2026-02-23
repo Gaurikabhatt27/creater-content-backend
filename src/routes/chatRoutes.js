@@ -9,9 +9,9 @@ import {
 
 const router = express.Router();
 
-router.get("/", getConversation);
-router.post("/message", sendMessage);
-router.get("/:conversationId", getMessages);
-router.post("/conversation", createConversation);
+router.get("/", protect, getConversation);
+router.post("/message", protect, sendMessage);
+router.get("/:conversationId", protect, getMessages);
+router.post("/conversation", protect, createConversation);
 
 export default router;

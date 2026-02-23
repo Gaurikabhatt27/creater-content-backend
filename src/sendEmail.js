@@ -11,7 +11,7 @@ export const sendEmail = async (to, subject, text) => {
   });
 
   await transporter.sendMail({
-    from: `"CreatorConnect" <${process.env.EMAIL_USER}>`,
+    from: `"Pixora" <${process.env.EMAIL_USER}>`,
     to: to,
     subject: subject,
     text: text
