@@ -98,3 +98,9 @@ export const verifyOtpController = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+export const getMe = async (req, res) => {
+  const token = req.cookies.token;
+  if(token) return res.json({ id: 1, name: "Test User" });
+  return res.status(401).json({ message: "Not authenticated" });
+};
