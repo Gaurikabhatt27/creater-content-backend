@@ -26,6 +26,15 @@ const messageSchema = new mongoose.Schema(
             enum: ["sent", "delivered", "read"],
             default: "sent",
         },
+        mediaUrl: {
+            type: String,
+            default: null
+        },
+        mediaType: {
+            type: String,
+            enum: ["image", "video", "raw", "auto", null],
+            default: null
+        }
     },
     { timestamps: true }
 );

@@ -45,3 +45,40 @@ export const sendMessage = async (conversationId, senderId, receiverId, text) =>
 
     return message;
 };
+
+import cloudinary from "../config/cloudinary.js";
+
+export const sendMediaMessage = async (file, conversationId, senderId, receiverId, text) => {
+    if (!file) {
+        throw new Error("File is required");
+    }
+
+    const uploadResult = await new Promise((resolve, reject) => {
+        cloudinary.uploader.upload_stream(
+            {
+                resource_type: "auto"
+            },
+            (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+            }
+        ).end(file.buffer);
+    });
+
+    const message = new Message({
+        conversation: conversationId,
+        sender: senderId,
+        receiver: receiverId,
+        text: text || "Media Attachment",
+        mediaUrl: uploadResult.secure_url,
+        mediaType: uploadResult.resource_type
+    });
+
+    await message.save();
+
+    await Conversation.findByIdAndUpdate(conversationId, {
+        lastMessage: message._id
+    });
+
+    return message;
+};
