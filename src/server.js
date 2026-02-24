@@ -9,6 +9,7 @@ import assetRoutes from "./routes/assetRoute.js";
 import chatRoutes from "./routes/chatRoutes.js";
 import http from "http";
 import { initSocket } from "./sockets/socket.js";
+import payRoutes from "./routes/paymentRoute.js";
 
 connectDB();
 
@@ -27,6 +28,7 @@ app.use(cors({
 app.use("/api/assets", assetRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/payment", payRoutes);
 
 const PORT = process.env.PORT || 5500;
 
