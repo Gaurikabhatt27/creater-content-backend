@@ -1,12 +1,12 @@
 import { Server } from "socket.io";
 
 let io;
-const userSockets = {}; // {userId: [socketId1, socketId2]}
+const userSockets = {};
 
 export const initSocket = (server) => {
     io = new Server(server, {
         cors: {
-            origin: "http://localhost:5173",
+            origin: ["http://localhost:5173", "http://localhost:5174"],
             credentials: true
         }
     });
@@ -20,7 +20,6 @@ export const initSocket = (server) => {
             userSockets[userId].push(socket.id);
         }
 
-        // io.emit() is used to send events to all the connected clients
         io.emit("getOnlineUsers", Object.keys(userSockets));
 
         socket.on("join", (userId) => {

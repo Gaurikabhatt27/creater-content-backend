@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/Gaurikabhatt27/creater-content-backend#readme",
   "dependencies": {
+    "@socket.io/redis-adapter": "^8.3.0",
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.9.0",
     "cookie-parser": "^1.4.7",
@@ -31,6 +32,8 @@
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
     "nodemailer": "^8.0.1",
+    "razorpay": "^2.9.6",
+    "redis": "^5.11.0",
     "socket.io": "^4.8.3"
   }
 }

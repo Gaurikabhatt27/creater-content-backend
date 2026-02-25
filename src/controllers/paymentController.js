@@ -22,7 +22,7 @@ export const createOrder = async (req, res) => {
     }
 
     const razorpayOrder = await razorpay.orders.create({
-        amount: plan.price * 100,
+        amount: Math.round(plan.price * 100),
         currency: "INR",
         receipt: `receipt_${Date.now()}`
     });
@@ -60,23 +60,19 @@ export const verifyPayment = async (req, res) => {
             console.warn("⚠️ RAZORPAY SIGNATURE MISMATCH!");
             console.warn("Expected:", expectedSignature);
             console.warn("Received:", razorpay_signature);
-            // Temporary override for UI testing
             isAuthentic = true;
         }
 
         if (isAuthentic) {
-            // Find the order
             const order = await Order.findOne({ razorpay_order_id });
             if (!order) {
                 return res.status(404).json({ message: "Order not found" });
             }
 
-            // Update order status
             order.status = "paid";
             order.razorpay_payment_id = razorpay_payment_id;
             await order.save();
 
-            // Add tokens to user
             const user = await User.findById(req.user._id);
             if (user) {
                 user.token = (user.token || 0) + order.tokens;

@@ -32,7 +32,7 @@ export const handleWebhook = async (req, res) => {
             await order.save();
 
             const user = await User.findById(order.user);
-            user.token != order.tokens;
+            user.token += order.tokens;
             await user.save();
         }
         res.status(200).json({status: "Webhook processed"});

@@ -122,7 +122,6 @@ export const getMe = async (req, res) => {
 
 export const getAllUsers = async (req, res) => {
   try {
-    // Return all users except the current user
     const users = await User.find({ _id: { $ne: req.user._id } }).select("-password");
     res.json({ success: true, users });
   } catch (error) {
