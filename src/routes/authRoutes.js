@@ -9,7 +9,7 @@ router.post("/login", login);
 router.post("/logout", logout);
 router.post("/send-otp", sendOtpController);
 router.post("/verify-otp", verifyOtpController);
-router.get("/me", getMe, protect);
+router.get("/me", protect, getMe);
 router.get("/users", protect, getAllUsers);
 
 export default router;

@@ -17,7 +17,8 @@ export const signup = async (req, res) => {
       _id: user._id,
       id: user._id,
       name: user.name,
-      email: user.email
+      email: user.email,
+      tokenBalance: user.token
     });
 
   } catch (error) {
@@ -39,6 +40,7 @@ export const login = async (req, res) => {
       id: user._id,
       name: user.name,
       email: user.email,
+      tokenBalance: user.token,
       token
     });
 
@@ -111,7 +113,8 @@ export const getMe = async (req, res) => {
       _id: user._id,
       id: user._id,
       name: user.name,
-      email: user.email
+      email: user.email,
+      tokenBalance: user.token
     });
   }
   return res.status(401).json({ message: "Not authenticated" });
