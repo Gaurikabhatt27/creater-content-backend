@@ -1,27 +1,38 @@
+import { createAdapter } from "@socket.io/redis-adapter";
 import { Server } from "socket.io";
+import { pubClient, subClient } from "../config/redis.js";
 
 let io;
-const userSockets = {}; // {userId: [socketId1, socketId2]}
+const userSockets = {};
 
 export const initSocket = (server) => {
     io = new Server(server, {
         cors: {
-            origin: "http://localhost:5173",
+            origin: ["http://localhost:5173","http://localhost:5174"],
             credentials: true
         }
     });
 
-    io.on("connection", (socket) => {
+    io.adapter(createAdapter(pubClient, subClient));
+
+    io.on("connection", async (socket) => {
         console.log("A user connected:", socket.id);
 
         const userId = socket.handshake.query.userId;
+
         if (userId && userId !== "undefined") {
+
+            await pubClient.sAdd(`online:${userId}`, socket.id);
+
             if (!userSockets[userId]) userSockets[userId] = [];
             userSockets[userId].push(socket.id);
         }
 
-        // io.emit() is used to send events to all the connected clients
-        io.emit("getOnlineUsers", Object.keys(userSockets));
+
+        const keys = await pubClient.keys("online:*");
+        const onlineUsers = keys.map(key => key.split(":")[1]);
+
+        io.emit("getOnlineUsers", onlineUsers);
 
         socket.on("join", (userId) => {
             socket.join(userId);
@@ -36,19 +47,35 @@ export const initSocket = (server) => {
             const { receiver } = messageData;
 
             if (receiver) {
-                socket.to(receiver).emit("receiveMessage", messageData);
+                io.to(receiver).emit("receiveMessage", messageData);
             }
         });
 
-        socket.on("disconnect", () => {
+        socket.on("disconnect", async () => {
             console.log("User disconnected:", socket.id);
-            if (userId && userId !== "undefined" && userSockets[userId]) {
-                userSockets[userId] = userSockets[userId].filter(id => id !== socket.id);
-                if (userSockets[userId].length === 0) {
-                    delete userSockets[userId];
+
+            if (userId && userId !== "undefined") {
+
+                await pubClient.sRem(`online:${userId}`, socket.id);
+
+                const remaining = await pubClient.sCard(`online:${userId}`);
+
+                if (remaining === 0) {
+                    await pubClient.del(`online:${userId}`);
+                }
+
+                if (userSockets[userId]) {
+                    userSockets[userId] = userSockets[userId].filter(id => id !== socket.id);
+                    if (userSockets[userId].length === 0) {
+                        delete userSockets[userId];
+                    }
                 }
             }
-            io.emit("getOnlineUsers", Object.keys(userSockets));
+
+            const keys = await pubClient.keys("online:*");
+            const onlineUsers = keys.map(key => key.split(":")[1]);
+
+            io.emit("getOnlineUsers", onlineUsers);
         });
     });
 

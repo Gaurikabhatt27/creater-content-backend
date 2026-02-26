@@ -28,6 +28,17 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
+    const ip = req.ip;
+    const key = `login_attempts:${ip}`;
+    const attempts = await pubClient.incr(key);
+    if(attempts === 1){
+      await pubClient.expire(key, 60);
+    }
+    if(attempts > 5){
+      return res.status(429).json({
+        message: "Too many login attempts. Try again later."
+      });
+    }
     const { user, token } = await loginUser(req.body);
 
     res.cookie("token", token, {
@@ -105,6 +116,8 @@ export const verifyOtpController = async (req, res) => {
 };
 
 import User from "../models/User.js";
+import { pubClient } from "../config/redis.js";
+import message from "../models/message.js";
 
 export const getMe = async (req, res) => {
   const user = req.user;
