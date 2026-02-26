@@ -1,7 +1,6 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-// import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import "dotenv/config";
@@ -10,8 +9,10 @@ import chatRoutes from "./routes/chatRoutes.js";
 import http from "http";
 import { initSocket } from "./sockets/socket.js";
 import payRoutes from "./routes/paymentRoute.js";
+import { connectRedis } from "./config/redis.js";
 
 connectDB();
+await connectRedis();
 
 const app = express();
 const server = http.createServer(app);
@@ -21,7 +22,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "http://localhost:5174"],
     credentials: true
 }));
 
